@@ -13,10 +13,15 @@ hook() {
 echo $@
 
 if test $# -gt 0; then
+  # # Possibly using this to push to protected repos
+  # gitUrl=$2
+  # echo $gitUrl
+  # targetRepo=https://$GIT_USER@$GIT_PASS:${gitUrl:8}
+  # echo $targetRepo
   hook pre-release
   echo "... pushing $1"
-  git push $2 \
-    && git push $2 --tags \
+  git push \
+    && git push --tags \
     && hook post-release \
     && echo "... complete"
 else

@@ -23,5 +23,9 @@
     "colors": "~0.6.0-1",
     "conventional-recommended-bump": "^1.0.0",
     "optimist": "~0.6.0"
+  },
+  "devDependencies": {
+    "commitizen": "^2.9.6",
+    "git-hooks": "^1.1.8"
   }
 }

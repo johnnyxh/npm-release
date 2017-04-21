@@ -2,11 +2,11 @@
 
 var spawn = require('child_process').spawn,
     exec = require('child_process').exec,
+    conventionalBump = require('conventional-recommended-bump'),
     path = require('path'),
     fs = require('fs'),
     argv = require('optimist').argv,
     colors = require('colors'),
-    version = process.argv[2],
     releasePath = path.resolve(__dirname, './git-release');
 
 var exit = function (str) {
@@ -43,52 +43,55 @@ var getCurrentVersion = function () {
   return getPkg().version;
 };
 
-var oldVersion = getCurrentVersion(),
-    message = argv.m || argv.message;
+var oldVersion = getCurrentVersion();
 
 if (!oldVersion) error('No version in package.json found.');
-if (!version) error('No version supplied.');
 
-// Run npm verison (tags & commits)
-msg('Updating version...');
-// %s is npm version variable: https://npmjs.org/doc/version.html
-var npm = spawn('npm', ['version', version, '-m', message || "Release v%s."]);
-npm.stdout.pipe(process.stdout);
-npm.stderr.pipe(process.stderr);
+conventionalBump({
+    preset: 'angular'
+}, function(err, result) {
+    console.log(result.releaseType);
 
-npm.on('close', function (code) {
-  if (code !== 0) return error('npm version. Exiting.');
+    // Run npm verison (tags & commits)
+    msg('Updating version...');
+    // %s is npm version variable: https://npmjs.org/doc/version.html
+    var npm = spawn('npm', ['version', result.releaseType, '-m', "chore(release): Release v%s."]);
+    npm.stdout.pipe(process.stdout);
+    npm.stderr.pipe(process.stderr);
 
-  success('Version bumped from', oldVersion, 'to', getCurrentVersion());
-  msg('Pushing...');
+    npm.on('close', function (code) {
+      if (code !== 0) return error('npm version. Exiting.');
 
-  // Run git-release (tag & push)
-  var release = spawn('sh', [releasePath, getCurrentVersion()]);
-  release.stdout.pipe(process.stdout);
-  release.stderr.pipe(process.stderr);
-  release.on('close', function (code) {
-    if (code !== 0) return error('git-release. Exiting.');
+      success('Version bumped from', oldVersion, 'to', getCurrentVersion());
+      msg('Pushing...');
 
-    success('Pushed.');
+      // Run git-release (tag & push)
+      var release = spawn('sh', [releasePath, getCurrentVersion(), getPkg().repository.url]);
+      release.stdout.pipe(process.stdout);
+      release.stderr.pipe(process.stderr);
+      release.on('close', function (code) {
+        if (code !== 0) return error('git-release. Exiting.');
 
-    if (getPkg().private) {
-      msg('Publish to npm cancelled, this is a private repo.');
-      return done();
-    }
+        success('Pushed.');
 
-    msg('Publishing to npm...');
+        if (getPkg().private) {
+          msg('Publish to npm cancelled, this is a private repo.');
+          return done();
+        }
 
-    // Publish to npm
-    var publish = spawn('npm', ['publish']);
-    publish.stdout.pipe(process.stdout);
-    publish.stderr.pipe(process.stderr);
-    publish.on('close', function (code) {
-      if (code !== 0) return error('npm publish. Exiting.');
+        msg('Publishing to npm...');
 
-      success('Published to npm.');
-      done();
+        // Publish to npm
+        var publish = spawn('npm', ['publish']);
+        publish.stdout.pipe(process.stdout);
+        publish.stderr.pipe(process.stderr);
+        publish.on('close', function (code) {
+          if (code !== 0) return error('npm publish. Exiting.');
 
+          success('Published to npm.');
+          done();
+
+        });
+      });
     });
-  });
 });
-

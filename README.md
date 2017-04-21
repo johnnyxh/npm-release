@@ -3,28 +3,18 @@
 A little script to help release `npm` modules. It:
 
 - Bumps the version in `package.json`
-- Commits 'Release vX.X.X-X'
+- Commits 'chore(release): Release vX.X.X-X'
 - Tags
 - Pushes the commit & tag (`git push && git push --tags`)
 - Releases to npm (with `npm publish`)
 
-You can use this (I do!) but I recommend looking at [semantic-release][s-r] too.
+Does all of the above automatically based on commit messages since the last release. Commits should be using the AngularJS Commit Guidelines, as this package will use the type of the commits to decide the next version.
+
+[Semantic-release][s-r] is a great tool, but if you aren't on Github (and possibly Gitlab) you might be out of luck.
 
 ## Usage
 
 You must use `npm-release` in a folder with a `package.json` and a remote to push to.
-
-`npm-release 0.0.2`
-
-It supports the same version options as `npm version`.
-
-`npm-release [<newversion> | major | minor | patch | build]`
-
-And custom commit messages:
-
-`npm-release major -m "#yolo"`
-
-Finger-licking good!
 
 ## Install
 

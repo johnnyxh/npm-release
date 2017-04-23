@@ -66,9 +66,10 @@ conventionalBump({
       msg('Pushing...');
 
       // Run git-release (tag & push)
-      var release = spawn('sh', [releasePath, getCurrentVersion(), getPkg().repository.url]);
-      release.stdout.pipe(process.stdout);
-      release.stderr.pipe(process.stderr);
+      require('simple-git')()
+        .push()
+        .pushTags();
+
       release.on('close', function (code) {
         if (code !== 0) return error('git-release. Exiting.');
 

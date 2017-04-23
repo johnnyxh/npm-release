@@ -24,7 +24,8 @@
     "colors": "~0.6.0-1",
     "conventional-recommended-bump": "^1.0.0",
     "cross-spawn": "^5.1.0",
-    "optimist": "~0.6.0"
+    "optimist": "~0.6.0",
+    "simple-git": "^1.70.0"
   },
   "devDependencies": {
     "commitizen": "^2.9.6",

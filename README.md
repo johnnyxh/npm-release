@@ -14,7 +14,7 @@ Does all of the above automatically based on commit messages since the last rele
 
 ## Usage
 
-You must use `npm-release` in a folder with a `package.json` and a remote to push to.
+You must use `npm-release` in a folder with a `package.json` and a remote to push to. Set the `GIT_USER` and `GIT_PASS` environment variables to set credentials if needed.
 
 ## Install
 

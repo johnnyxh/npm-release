@@ -68,31 +68,28 @@ conventionalBump({
       // Run git-release (tag & push)
       require('simple-git')()
         .push()
-        .pushTags();
+        .pushTags()
+        .then(() => {
+          success('Pushed.');
 
-      release.on('close', function (code) {
-        if (code !== 0) return error('git-release. Exiting.');
+          if (getPkg().private) {
+            msg('Publish to npm cancelled, this is a private repo.');
+            return done();
+          }
 
-        success('Pushed.');
+          msg('Publishing to npm...');
 
-        if (getPkg().private) {
-          msg('Publish to npm cancelled, this is a private repo.');
-          return done();
-        }
+          // Publish to npm
+          var publish = spawn('npm', ['publish']);
+          publish.stdout.pipe(process.stdout);
+          publish.stderr.pipe(process.stderr);
+          publish.on('close', function (code) {
+            if (code !== 0) return error('npm publish. Exiting.');
 
-        msg('Publishing to npm...');
+            success('Published to npm.');
+            done();
 
-        // Publish to npm
-        var publish = spawn('npm', ['publish']);
-        publish.stdout.pipe(process.stdout);
-        publish.stderr.pipe(process.stderr);
-        publish.on('close', function (code) {
-          if (code !== 0) return error('npm publish. Exiting.');
-
-          success('Published to npm.');
-          done();
-
+          });
         });
-      });
     });
 });

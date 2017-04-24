@@ -74,9 +74,9 @@ conventionalBump({
         repoUrl = url.format(repoObj);
       }
       // Run git-release (tag & push)
-      require('simple-git')()
-        .push([repoUrl])
-        .pushTags([repoUrl])
+      var git = require('simple-git')();
+      git.push([repoUrl])
+        .then(() => { return git.pushTags([repoUrl]) })
         .then(() => {
           success('Pushed.');
 
